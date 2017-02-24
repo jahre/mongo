@@ -1,0 +1,14 @@
+extends layout
+  
+block content
+    - var values = data;
+    p #{data}
+    p #{values}
+    ul
+    each val in values
+        li
+            span= val.name
+            each vul in val
+                h1 #{vul.helpa} 
+                p #{vul.helpb}
+    
