@@ -71,6 +71,7 @@ router.get('/', function(req, res, next) {
         }).then(function(successMessage){
             console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
             console.log(successMessage);
+            var positionC = 0;
             successMessage.forEach(function(child) {
                 // for(var v = 0; v < successMessage.length; v++){
                 //     var child = successMessage[v];
@@ -114,8 +115,8 @@ router.get('/', function(req, res, next) {
                     console.log('action on: ' + child._id);
                     console.log(masteryourdemons);
                     drakonv2(masteryourdemons, child._id);
-                    b.children[child.position] = {};
-                    b.children[child.position] = child;
+                    b.children[positionC] = {};
+                    b.children[positionC] = child;
                 }
                 
 
@@ -135,6 +136,7 @@ router.get('/', function(req, res, next) {
                 //if(child.children.length){
                     
                     getChildren(child._id, child.children.length); 
+                    positionC++
                 //}
 
                 
