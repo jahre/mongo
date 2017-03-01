@@ -1,11 +1,25 @@
 extends layout
   
 block content
-  ol
+  
       h1 mongo
-      each item in data
+      ol
+      each level1key, level1property in data
         li
           p id: 
-            b= item._id
+            b= level1key
           p parent: 
-            b= item.parent
+            b= level1key
+          p 
+            i children: 
+            b= level1key
+            //- ol
+            //- each level2 in level1.children
+            //-   li
+            //-     p id: 
+            //-       b= level2._id
+            //-     p parent: 
+            //-       b= level2.parent
+            //-     p 
+            //-       i children: 
+                  

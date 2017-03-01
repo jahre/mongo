@@ -17,6 +17,7 @@
     "multer": "^1.2.1",
     "node-sass-middleware": "0.9.8",
     "nodemon": "^1.11.0",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "cors": "^2.8.1"
   }
 }

@@ -61,6 +61,7 @@ router.get('/', function(req, res, next) {
                         //console.log(masteryourdemons);
                         //console.log('+++++++++');
                         //res.render('index', { data: familyArray });
+                        //res.render('index', { data: masteryourdemons });
                         res.send(masteryourdemons);
                     }
                     reject();
