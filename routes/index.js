@@ -10,6 +10,7 @@ router.get('/', function(req, res, next) {
     var familyTree = {};
 
     getChildren = function (id, collectionLength, settings = true) {
+	console.log("** /n /n /n **");	
 	//initial request - request to know number of documents
 	if (collectionLength == undefined) {
 		return new Promise(function (resolve, reject) {
@@ -34,20 +35,30 @@ router.get('/', function(req, res, next) {
 		if (documentCount == 0) {
 			documentCount = collectionLength;
 		}
-		i++;
+		
 
         //sort the documents
-		var result = collection.find({parent: id}, {sort: {position: 1}	});
-
-		var childrenCheck = result
-		if (!settings || i == documentCount) {
+		//var result = collection.find({parent: id}, {sort: {position: 1}	});
+		var result = collection.aggregate(
+			[ 
+				{ $match: { parent: id } },  
+				{ $sort : { position : 1 } }
+			]
+		);
+		var childrenCheck = result;
+		console.log(":::::::::::::::::::::::: documentCount  " + documentCount);
+		console.log(":::::::::::::::::::::::: i  " + i);
+		console.log(":::::::::::::::::::::::: collectionLength  " + !collectionLength);
+		if (!collectionLength || i == documentCount) {
 			if (i == documentCount) {
-				console.log('familyTree:');
+				console.log('Finally!familyTree:');
 				console.log(familyTree);
 				res.send(familyTree);
 			}
+			i++;
 			reject();
 		} else {
+			i++;
 			resolve(result)
 		}
 	})
@@ -99,14 +110,14 @@ router.get('/', function(req, res, next) {
 					familyTreeBuffer.children[childNumber] = {};//string to object change to set a new value
 					familyTreeBuffer.children[childNumber] = child;//set an object instead of childs name
 				}
-
-
+				//console.log(":::::::::::::::::::::::: " + child._id);
+				//console.log(":::::::::::::::::::::::: " + child.children.length);
 				getChildren(child._id, child.children.length);//next call to retrive other children
 				childNumber++
 			});
 		})
 		.catch(function () {
-			console.log("Promise Rejected");
+			console.log("Promise Rejected (settings) " + settings);
 		});
 };
 getChildren('Books');
