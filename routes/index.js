@@ -1,7 +1,48 @@
 var express = require('express');
 var path = require('path');
 var router = express.Router();
-
+/*var model = {
+	'_id': 'Programming',
+	'parent': 'Books',
+	'position': '0',
+	'children': [
+		{
+			'_id': 'Languages',
+			'parent': 'Programming',
+			'position': '0',
+			'children': []
+		}, {
+			'_id': 'Databases',
+			'parent': 'Programming',
+			'position': '1',
+			'children': [
+				{
+					'_id': 'MongoDB',
+					'parent': 'Databases',
+					'position': '0',
+					'children': []
+				}, {
+					'_id': 'dbm',
+					'parent': 'Databases',
+					'position': '1',
+					'children': [
+						{
+							'_id': 'Test',
+							'parent': 'dbm',
+							'position': '0',
+							'children': []
+						}
+					]
+				}
+			]
+		}, {
+			'_id': 'White',
+			'parent': 'Programming',
+			'position': '2',
+			'children': []
+		}
+	]
+}*/
 router.get('/', function(req, res, next) {
     var db = req.db;
     var collection = db.get('tree');//get family tree collection
