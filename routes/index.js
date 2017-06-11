@@ -1,7 +1,15 @@
 var express = require('express');
 var path = require('path');
 var router = express.Router();
-/*var model = {
+// var mongo = require('mongodb');
+// var monk = require('monk');
+
+// var db = monk('localhost:27017/family');
+// 	db.on('error', console.error.bind(console, 'connection error:'));
+// 	db.once('open', function() {
+// 	console.log('ok-good');
+// });
+/*var model = [{
 	'_id': 'Programming',
 	'parent': 'Books',
 	'position': '0',
@@ -42,7 +50,7 @@ var router = express.Router();
 			'children': []
 		}
 	]
-}*/
+}]*/
 router.get('/', function(req, res, next) {
     var db = req.db;
     var collection = db.get('tree');//get family tree collection
@@ -161,6 +169,33 @@ router.get('/', function(req, res, next) {
 			console.log("Promise Rejected (settings) " + settings);
 		});
 };
+
+router.get('/add', function(req, res, next) {
+  res.render('add', { title: 'Add' });
+});
+
+router.post('/add', function(req, res, next) {
+  let db = req.db;
+  let collection = db.get('tree');//get family tree collection
+  let reqParams = req.body;
+  console.log('5555555555555555555555555555555555555555555555555555555555555');
+  console.log(reqParams);
+
+  collection.insert(
+	{ name: reqParams._id, 
+      parent: reqParams.parent,
+      position: 0,
+	  children: [] }
+	);
+
+  collection.findAndModify({
+    query: { _id: reqParams.parent },
+    update: { $push: { children: reqParams._id }}
+  });
+
+   res.redirect('/add');
+});
+
 getChildren('Books');
 
 });
