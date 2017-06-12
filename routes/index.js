@@ -54,30 +54,75 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
     var db = req.db;
     var collection = db.get('tree');//get family tree collection
-    var i = 0;
+    var i = 1;
     var documentCount = 0;
     var familyTree = {};
+	var familyArray = [];
 
-    getChildren = function (id, collectionLength, settings = true) {
-	console.log("** /n /n /n **");	
-	//initial request - request to know number of documents
-	if (collectionLength == undefined) {
+	function countAll(){
+		//initial request - request to know number of documents
 		return new Promise(function (resolve, reject) {
-			initialInfo = collection.count();
+			let initialInfo = collection.count();
 			if (initialInfo) {
 				resolve(initialInfo);
 			} else {
 				reject();
 			};
-		})
-			.then(function (info) {
-                //if all good, call funtcion with documents number, and the same id
-				getChildren(id, info);
+		}).then(function (info) {
+				//if all good, call funtcion with documents number, and the same id
+				//getChildren('Books', info);
+				getStirpes(info);
 			})
 			.catch(function () {
 				console.log("Promise Rejected");
 			});
 	};
+
+	function getStirpes(count){
+		return new Promise(function (resolve, reject) {
+			let stirpes = collection.aggregate(
+				[ 
+					{ $match: { parent: "" } },  
+					{ $sort : { position : 1 } }
+				]
+			);
+			if (stirpes) {
+				resolve(stirpes);
+			} else {
+				reject();
+			};
+		}).then(function (stirpes) {
+				//if all good, call funtcion with documents number, and the same id
+				
+				console.log(count);
+				getChildren(stirpes[0]._id, count);
+				//renderAll(stirpes, count);
+
+			})
+			.catch(function () {
+				console.log("Promise Rejected");
+			});
+	}
+
+	function renderAll(currentArray, count){
+		//initial request - request to know number of documents
+		return new Promise(function (resolve, reject) {
+			
+			let genesis = getChildren(currentArray[0]._id, count);
+			if (genesis) {
+				resolve(genesis);
+			} else {
+				reject();
+			};
+		}).then(function (info) {
+				res.send(info);
+			})
+			.catch(function () {
+				console.log("Promise Rejected");
+			});
+	};
+
+    function getChildren(id, collectionLength, settings = true) {
 
 	//requests to retrieve documents data
 	return new Promise(function (resolve, reject) {
@@ -88,7 +133,7 @@ router.get('/', function(req, res, next) {
 
         //sort the documents
 		//var result = collection.find({parent: id}, {sort: {position: 1}	});
-		var result = collection.aggregate(
+		let result = collection.aggregate(
 			[ 
 				{ $match: { parent: id } },  
 				{ $sort : { position : 1 } }
@@ -97,18 +142,19 @@ router.get('/', function(req, res, next) {
 		var childrenCheck = result;
 		console.log(":::::::::::::::::::::::: documentCount  " + documentCount);
 		console.log(":::::::::::::::::::::::: i  " + i);
-		console.log(":::::::::::::::::::::::: collectionLength  " + !collectionLength);
-		if (!collectionLength || i == documentCount) {
+		console.log(":::::::::::::::::::::::: collectionLength  " + collectionLength);
+		if (i == documentCount) {
 			if (i == documentCount) {
 				console.log('Finally!familyTree:');
 				console.log(familyTree);
 				res.send(familyTree);
+				//familyArray.push(familyTree);
+				//return familyTree;
 			}
-			i++;
 			reject();
 		} else {
-			i++;
-			resolve(result)
+			resolve(result);
+			
 		}
 	})
 		.then(function (queryDataArray) {
@@ -153,6 +199,7 @@ router.get('/', function(req, res, next) {
                 
 				if (i == 1) {//omit if request is initial
 					familyTree = child;
+					console.log('---------------------========================::::::::::::::::::: ' + familyTree);
 				} else {
 					console.log('Finding Ancestors in: ' + child._id);
 					retrieveAncestors(familyTree, child._id);
@@ -161,8 +208,10 @@ router.get('/', function(req, res, next) {
 				}
 				//console.log(":::::::::::::::::::::::: " + child._id);
 				//console.log(":::::::::::::::::::::::: " + child.children.length);
+				i++;
 				getChildren(child._id, child.children.length);//next call to retrive other children
-				childNumber++
+				childNumber++;
+				
 			});
 		})
 		.catch(function () {
@@ -176,27 +225,28 @@ router.get('/add', function(req, res, next) {
 
 router.post('/add', function(req, res, next) {
   let db = req.db;
-  let collection = db.get('tree');//get family tree collection
+  let collection = db.get('cztery');//get family tree collection
   let reqParams = req.body;
   console.log('5555555555555555555555555555555555555555555555555555555555555');
   console.log(reqParams);
 
   collection.insert(
-	{ name: reqParams._id, 
+	{ name: reqParams.name, 
       parent: reqParams.parent,
       position: 0,
 	  children: [] }
 	);
 
-  collection.findAndModify({
-    query: { _id: reqParams.parent },
-    update: { $push: { children: reqParams._id }}
-  });
+//   collection.findAndModify({
+//     query: { _id: reqParams.parent },
+//     update: { $push: { children: reqParams._id }}
+//   });
 
    res.redirect('/add');
 });
 
-getChildren('Books');
+//getChildren('Books');
+countAll();
 
 });
 
