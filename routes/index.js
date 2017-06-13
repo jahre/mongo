@@ -238,10 +238,12 @@ router.post('/add', function(req, res, next) {
   let reqParams = req.body;
   console.log('5555555555555555555555555555555555555555555555555555555555555');
   console.log(reqParams);
-
+  let o_id = new ObjectId();
   collection.insert(
-	{ name: reqParams.name, 
-      parent: reqParams.parent,
+	{ _id: o_id,
+	  name: reqParams.name, 
+      //parent: reqParams.parent,
+	  parent: o_id.toString(),
       position: 0,
 	  children: [] }
 	);
