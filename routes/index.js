@@ -1,6 +1,7 @@
 var express = require('express');
 var path = require('path');
 var router = express.Router();
+var ObjectId = require('mongodb').ObjectId; 
 // var mongo = require('mongodb');
 // var monk = require('monk');
 
@@ -53,7 +54,8 @@ var router = express.Router();
 }]*/
 router.get('/', function(req, res, next) {
     var db = req.db;
-    var collection = db.get('tree');//get family tree collection
+    //var collection = db.get('tree');//get family tree collection
+	var collection = db.get('cztery');//get family tree collection
     var i = 1;
     var documentCount = 0;
     var familyTree = {};
@@ -95,7 +97,8 @@ router.get('/', function(req, res, next) {
 				//if all good, call funtcion with documents number, and the same id
 				
 				console.log(count);
-				getChildren(stirpes[0]._id, count);
+				console.log(typeof stirpes[0]._id.toString());
+				getChildren(stirpes[0]._id.toString(), count);
 				//renderAll(stirpes, count);
 
 			})
@@ -130,9 +133,13 @@ router.get('/', function(req, res, next) {
 			documentCount = collectionLength;
 		}
 		
-
+		//let o_id = new ObjectId(id);
+		console.log(":::::::::::::::::::::::: ID  ");
+		console.log(id);
+		//db.test.find({_id:o_id});
         //sort the documents
 		//var result = collection.find({parent: id}, {sort: {position: 1}	});
+		
 		let result = collection.aggregate(
 			[ 
 				{ $match: { parent: id } },  
@@ -199,17 +206,19 @@ router.get('/', function(req, res, next) {
                 
 				if (i == 1) {//omit if request is initial
 					familyTree = child;
+					console.log('---------------------========================::::::::::::::::::: ');
 					console.log('---------------------========================::::::::::::::::::: ' + familyTree);
 				} else {
-					console.log('Finding Ancestors in: ' + child._id);
-					retrieveAncestors(familyTree, child._id);
+					console.log('Finding Ancestors in: ' + child._id + '(' + child.name + ')');
+					
+					retrieveAncestors(familyTree, child._id.toString());
 					familyTreeBuffer.children[childNumber] = {};//string to object change to set a new value
 					familyTreeBuffer.children[childNumber] = child;//set an object instead of childs name
 				}
 				//console.log(":::::::::::::::::::::::: " + child._id);
 				//console.log(":::::::::::::::::::::::: " + child.children.length);
 				i++;
-				getChildren(child._id, child.children.length);//next call to retrive other children
+				getChildren(child._id.toString(), child.children.length);//next call to retrive other children
 				childNumber++;
 				
 			});
