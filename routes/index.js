@@ -229,8 +229,50 @@ router.get('/', function(req, res, next) {
 };
 
 router.get('/add', function(req, res, next) {
-  res.render('add', { title: 'Add' });
+  let db = req.db;
+  let collection = db.get('cztery');//get family tree collection
+
+//   collection.find(function (err, docs) {
+//     if (err) return console.error(err);
+//         let docArray = docs;
+// 		onsole.error('err');
+//         res.render('add', { data: docArray });
+//     })
+
+	function renderDocs(){
+		return new Promise(function (resolve, reject) {
+			let collection = db.get('cztery');//get family tree collection
+			let docs = collection.find({});
+			if (docs) {
+				resolve(docs);
+			} else {
+				reject(docs);
+			};
+		}).then(function (info) {
+				//res.send(info);
+				console.log('0000000000000000000000000000000000000000000000000000000');
+				console.log(info);
+				res.render('add', { data: info });
+			})
+			.catch(function () {
+				console.log("77777777777777Promise Rejected" + docs);
+			});
+	};
+
+	renderDocs();
 });
+
+
+router.get('/edit/:id', function(req, res, next) {
+  let a_id = req.params.id;
+
+  Article.find({_id: a_id}, function (err, articles) {
+    if (err) return console.error(err);
+        let artArray = articles[0];
+        res.render('article-edit', { data: artArray });
+    })
+});
+
 
 router.post('/add', function(req, res, next) {
   let db = req.db;
@@ -255,6 +297,33 @@ router.post('/add', function(req, res, next) {
 
    res.redirect('/add');
 });
+
+router.post('/add/:id', function(req, res, next) {
+  let db = req.db;
+  let collection = db.get('cztery');//get family tree collection
+  let reqParams = req.body;
+
+  console.log('6666666666666666666666666666666666666666666666666666666666666');
+  console.log(reqParams);
+  let o_id = new ObjectId();
+  //let parent_id = new ObjectId(reqParams.parent);
+  collection.insert(
+	{ _id: o_id,
+	  name: reqParams.name, 
+      parent: reqParams.parent,
+	  //parent: o_id.toString(),
+      position: reqParams.children_count,
+	  children: [] }
+	);
+	
+	collection.findAndModify({
+		query: { _id: reqParams.parent },
+		update: { $push: { children: o_id.toString() }}
+	});
+
+	res.redirect('/add');
+});
+
 
 //getChildren('Books');
 countAll();
