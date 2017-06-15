@@ -324,6 +324,25 @@ router.post('/add/:id', function(req, res, next) {
 	res.redirect('/add');
 });
 
+router.post('/delete', function(req, res, next) {
+	let db = req.db;
+	let collection = db.get('cztery');//get family tree collection
+	let reqParams = req.body;
+	let doc_id = reqParams.doc_id;
+	let o_id = new ObjectId(doc_id);
+	
+
+  collection.remove({_id: o_id});
+
+  collection.findAndModify({
+		query: { children: doc_id },
+		update: { $pull: { children: doc_id }}
+	});
+
+	res.redirect('/add');
+  
+});
+
 
 //getChildren('Books');
 countAll();

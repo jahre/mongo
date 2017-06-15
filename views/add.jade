@@ -8,6 +8,10 @@ block content
               input(type="hidden" name="children_count" value=item.children.length)
               input(type="text" name="name")
               input(type="submit" value="Add Successor")
+        form(method="post" action="/delete")
+              b= item._id
+              input(type="hidden" name="doc_id" value=item._id)
+              input(type="submit" value="Remove")
         br 
         p= item.children.length
         a(href="/edit/"+item._id )= 'Add to'+item._id+'('+item.name+')'
