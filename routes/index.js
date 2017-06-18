@@ -55,7 +55,8 @@ var ObjectId = require('mongodb').ObjectId;
 router.get('/', function(req, res, next) {
     var db = req.db;
     //var collection = db.get('tree');//get family tree collection
-	var collection = db.get('cztery');//get family tree collection
+	//var collection = db.get('cztery');//get family tree collection
+	var collection = db.get('five');//get family tree collection
     var i = 1;
     var documentCount = 0;
     var familyTree = {};
@@ -230,7 +231,8 @@ router.get('/', function(req, res, next) {
 
 router.get('/add', function(req, res, next) {
   let db = req.db;
-  let collection = db.get('cztery');//get family tree collection
+  //let collection = db.get('cztery');//get family tree collection
+  let collection = db.get('five');//get family tree collection
 
 //   collection.find(function (err, docs) {
 //     if (err) return console.error(err);
@@ -241,7 +243,8 @@ router.get('/add', function(req, res, next) {
 
 	function renderDocs(){
 		return new Promise(function (resolve, reject) {
-			let collection = db.get('cztery');//get family tree collection
+			//let collection = db.get('cztery');//get family tree collection
+			let collection = db.get('five');//get family tree collection
 			let docs = collection.find({});
 			if (docs) {
 				resolve(docs);
@@ -274,36 +277,16 @@ router.get('/edit/:id', function(req, res, next) {
 });
 
 
+
+
 router.post('/add', function(req, res, next) {
   let db = req.db;
-  let collection = db.get('cztery');//get family tree collection
-  let reqParams = req.body;
-  console.log('5555555555555555555555555555555555555555555555555555555555555');
-  console.log(reqParams);
-  let o_id = new ObjectId();
-  collection.insert(
-	{ _id: o_id,
-	  name: reqParams.name, 
-      //parent: reqParams.parent,
-	  parent: o_id.toString(),
-      position: 0,
-	  children: [] }
-	);
-
-//   collection.findAndModify({
-//     query: { _id: reqParams.parent },
-//     update: { $push: { children: reqParams._id }}
-//   });
-
-   res.redirect('/add');
-});
-
-router.post('/add/:id', function(req, res, next) {
-  let db = req.db;
-  let collection = db.get('cztery');//get family tree collection
+  //let collection = db.get('cztery');//get family tree collection
+  let collection = db.get('five');//get family tree collection
   let reqParams = req.body;
 
-  console.log('6666666666666666666666666666666666666666666666666666666666666');
+//   console.log('6666666666666666666666666666666666666666666666666666666666666777');
+//   console.log('6666666666666666666666666666666666666666666666666666666666666777');
   console.log(reqParams);
   let o_id = new ObjectId();
   //let parent_id = new ObjectId(reqParams.parent);
@@ -326,7 +309,8 @@ router.post('/add/:id', function(req, res, next) {
 
 router.post('/delete', function(req, res, next) {
 	let db = req.db;
-	let collection = db.get('cztery');//get family tree collection
+	//let collection = db.get('cztery');//get family tree collection
+	let collection = db.get('five');//get family tree collection
 	let reqParams = req.body;
 	let doc_id = reqParams.doc_id;
 	let o_id = new ObjectId(doc_id);
@@ -341,6 +325,48 @@ router.post('/delete', function(req, res, next) {
 
 	res.redirect('/add');
   
+});
+
+router.post('/prior', function(req, res, next) {
+  let db = req.db;
+	//let collection = db.get('cztery');//get family tree collection
+	let collection = db.get('five');//get family tree collection
+	let reqParams = req.body;
+	let doc_id = reqParams.doc_id;
+	let prior = reqParams.prior;
+	
+	let o_id = new ObjectId(doc_id);
+	
+	collection.findAndModify({
+		query: { priority: { $exists: true } },
+		update: { $unset: { priority: "" } }
+	});
+
+	// collection.findOneAndUpdate({
+	// 	query: {_id: o_id },
+	// 	update: { $set: { priority: 'doc_priority' } }
+	// });
+
+	 collection.findAndModify({
+		query: {_id: o_id },
+		update: { $set: { priority: !prior }}
+	});
+	// collection.findAndModify({
+	// 	query: {_id: o_id },
+	// 	update: { $set: { priority: 1 } }
+	// });
+
+	// var doc = collection.findOne({_id: o_id});
+	// collection.update({_id: o_id }, {$set: {priority: !doc.priority}});
+
+	//res.redirect('/add');
+	//console.log('real6666666666666666666666666666666666666666666666666666666666666777');
+	console.log(prior);
+	//console.log('reversed6666666666666666666666666666666666666666666666666666666666666777');
+	console.log(!prior);
+
+	res.redirect('/add');
+	
 });
 
 

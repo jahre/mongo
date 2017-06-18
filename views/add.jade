@@ -3,7 +3,7 @@ extends layout
 block content
   each item in data
     li(style="border:1px solid #000; margin: 20px; padding: 10px;")
-        form(method="POST" enctype action="/add/"+item._id)
+        form(method="POST" enctype action="/add")
               input(type="hidden" name="parent" value=item._id)
               input(type="hidden" name="children_count" value=item.children.length)
               input(type="text" name="name")
